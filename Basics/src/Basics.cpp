@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <limits>
 #include <string>
+#include <cstdint>
 //using namespace std;
 //
 //int main() {
@@ -58,6 +59,56 @@ int main() {
 	std::cout << 0.0 / 0.0 << std::endl;
 	// de ville en ville
 	std::cout << "I'm in " << ville << std::endl;
+	ville[0] = 'Z';  // 'Z' est de type char
+	std::cout << "I'm in " << ville << std::endl;
+	// affichage des adresses mémoires
+	std::cout << "adresse variable ville: " << &ville << std::endl;
+	std::cout << "adresse 1ere lettre de la variable ville: " << (void *) &ville[0] << std::endl;
+//	char villeC[] = "Bordeaux";  // tableau de char i.e le type "string" de C
+//	std::cout << "adresse tableau/1ere lettre: " << &villeC << ", " << (void *) &villeC[0] << std::endl;
+    std::cout << "Taille: " << ville.size() << std::endl;
+    ville.append(" ville rose");
+    std::cout << "Ville qualifiée : " << ville << " # " << ville.size() << std::endl;
+    std::string ville3; // chaine vide à l'aide du constructeur par défaut
+    std::cout << "Ville vide #" << ville3 << "# " <<  ville3.size() << std::endl;
+    ville3 += "Pau"; // equivalent append
+    ville3 += " dans le 64";
+    std::cout << "Ville plus vide #" << ville3 << "# " <<  ville3.size() << std::endl;
+
+    // opérateurs en C++
+    temperature = 9;
+    double result = (temperature + pression) * price / 10 - 5.0;
+    int result2 = temperature % 4; // modulo ou reste de la division entière (Euclide)
+    int result3 = temperature / 4; // quotient au sens d'Euclide
+    std::cout << "division: Q=" << result3 << ", R=" << result2 << std::endl;
+    std::cout << (temperature / 4.0) << std::endl;
+    temperature = temperature + 2;
+    temperature += 2;
+    std::cout << "ça chauffe: " << temperature << std::endl;
+    temperature /= 2;
+    std::cout << "coup de froid: " << temperature << std::endl;
+    // other:  -=  *=  %=
+    temperature++;
+    std::cout << "+1: " << temperature << std::endl;
+    ++temperature;
+    std::cout << "+1: " << temperature << std::endl;
+    std::cout << "pleins de +1: "
+    		<< (++temperature) << ", "
+			<< (temperature++) << ", "
+			<< temperature << std::endl;
+    // comparaison de contenu: ==  !=
+    bool cmp = (temperature == 15);
+    std::cout << "== : " << std::boolalpha << cmp << std::endl;
+    cmp = false; // true
+    // comparaison d'ordre: <  <=  > >=
+    // combinaison logique: ! (not)   && (and)   || (or)
+    cmp = ! ((temperature > 18) || (temperature <= 5));
+    std::cout << "predicat : " << std::boolalpha << cmp << std::endl;
+    // operator bitwise:  & (and)   | (or)    ^ (xor)    ~ (not)
+    uint8_t data = 5; // unsigned int 8 bits: 00000101
+    data = data | 12;  // 00000101 | 00001100 =>  00001101
+    std::cout << "Operation bitwise: #" << (int) data  << "#" <<  std::endl;
+
 	return 0;
 }
 
