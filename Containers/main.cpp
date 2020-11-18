@@ -74,9 +74,49 @@ void testContainersIterators() {
 	std::cout << std::endl;
 }
 
+void displayVector(const std::vector<double> &vector, const std::string &label) {
+	// label[0] = 'Z'; // impossible in const mode
+	// vector.push_back(1.5); // impossible in const mode
+	std::cout << label << " [ ";
+	for (double element: vector) {
+		std::cout << element << " ";
+	}
+	std::cout << "]" << std::endl;
+}
+
+void smoothingVector(std::vector<double> &vector, double threshold) {
+	for (double &element: vector) {
+		if (element > threshold) {
+			element = threshold;
+		}
+	}
+//	for (auto it=vector.begin(); it != vector.end(); ++it) {
+//		if (*it > threshold) {
+//			*it = threshold;
+//		}
+//	}
+//	for (unsigned int i=0; i<vector.size(); i++) {
+//		if (vector[i] > threshold) {
+//			vector[i] = threshold;
+//		}
+//	}
+}
+
+void testContainersMemory() {
+	std::vector<double> pressions = { 0.3, 0.31, 0.34, 0.32 };
+	std::string label = "space pressions";
+	// appel avec parametres passés par référence
+	displayVector(pressions, label);
+	displayVector(pressions, "cosmos pressions");
+	smoothingVector(pressions, 0.33);
+	displayVector(pressions, "after smoothing");
+	std::cout <<  label << std::endl;
+}
+
 int main() {
-	testArrays();
-	testContainersIterators();
+	//testArrays();
+	//testContainersIterators();
+	testContainersMemory();
 	std::cout << "That's all Folks !!" << std::endl;
 	return 0;
 }
