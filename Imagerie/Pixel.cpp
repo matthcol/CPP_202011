@@ -6,6 +6,8 @@
  */
 #include <cmath>
 #include <iostream>
+#include <sstream>
+
 
 #include "Pixel.h"
 
@@ -68,11 +70,17 @@ double Pixel::distance(const Pixel &other) const {
 	return hypot(this->x - other.x , this->y - other.y);
 }
 
+std::string Pixel::toString() const {
+	std::stringstream res;
+	res	<< "("
+		<< this->getX() << ","
+		<< this->getY() << ")#"
+		<< (uint16_t) this->getGreyScale();
+	return res.str();
+}
+
 std::ostream& operator<<(std::ostream &out, const Pixel &pixel) {
-	return out << "("
-			<< pixel.getX() << ","
-			<< pixel.getY() << ")#"
-			<< (uint16_t) pixel.getGreyScale();
+	return out << pixel.toString();
 }
 
 

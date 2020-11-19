@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <sstream>
 #include "Detection.h"
 
 Detection::Detection():
@@ -43,3 +44,24 @@ void Detection::computeInside(const Pixel &centre, uint16_t radius) {
 	// this->insideOrgan = centre.distance(*this) <= radius;
 	this->insideOrgan = this->distance(centre) <= radius;
 }
+
+std::string Detection::toString() const {
+	std::stringstream res;
+	res	<< "("
+		<< this->getX() << ","
+		<< this->getY() << ")#"
+		<< (uint16_t) this->getGreyScale()
+		<< "/" << std::boolalpha << this->isInsideOrgan();
+	return res.str();
+}
+
+//std::ostream& operator <<(std::ostream &out, const Detection &pixel) {
+//	return out << "("
+//			<< pixel.getX() << ","
+//			<< pixel.getY() << ")#"
+//			<< (uint16_t) pixel.getGreyScale()
+//			<< "/" << std::boolalpha << pixel.isInsideOrgan();
+//
+//}
+
+

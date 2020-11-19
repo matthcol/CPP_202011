@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <ostream>
+#include <string>
 
 class Pixel {
 private:
@@ -30,6 +31,8 @@ public:
 	void setX(uint16_t x);
 	uint16_t getY() const;
 	void setY(uint16_t y);
+
+	virtual std::string toString() const;
 
 	void smoothing(uint8_t greyScaleThreshold); // no const: modification
 	double distance(const Pixel &other) const; // no modification

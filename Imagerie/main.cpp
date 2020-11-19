@@ -133,7 +133,8 @@ void processPixelAsDetectionIfPossible2(const Pixel *pixel_ptr) {
 void processPixelAsDetectionIfPossible3(const Pixel &pixel_ref) {
 	if (typeid(pixel_ref) == typeid(Detection)) {
 		const Detection &detect_ref = dynamic_cast<const Detection&>(pixel_ref);
-		std::cout << "pixel is a Detection object: " << pixel_ref << std::endl;
+		//std::cout << "pixel is a Detection object: " << pixel_ref << std::endl;
+		std::cout << "pixel is a Detection object: " << detect_ref << std::endl;
 		std::cout << "\t - isOrgan: " << std::boolalpha
 				<< detect_ref.isInsideOrgan() << std::endl;
 	} else {
@@ -158,6 +159,15 @@ void testDetectionSubstitution() {
 //	processPixelAsDetectionIfPossible2(pixel2_ptr);
 	processPixelAsDetectionIfPossible3(*pixel1_ptr);
 	processPixelAsDetectionIfPossible3(*pixel2_ptr);
+
+	// no substitution here => only copy
+	Pixel pixel_direct = *pixel2_ptr; // constructor by copy de Pixel
+	pixel_direct = *pixel3_ptr; // copy by assignment
+
+	// toString
+	std::cout << "P1 toString: " << pixel1_ptr->toString() << std::endl;
+	std::cout << "P2 toString: " << pixel2_ptr->toString() << std::endl;
+	std::cout << "P3 toString: " << pixel3_ptr->toString() << std::endl;
 
 	delete pixel1_ptr;
 	delete pixel2_ptr;
