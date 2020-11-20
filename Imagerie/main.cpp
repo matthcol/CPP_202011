@@ -7,8 +7,17 @@
 
 
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <vector>
+#include <list>
+#include <set>
+#include <iterator>
+#include <algorithm>
+#include <numeric>
+#include <functional>
+#include <random>
+
 #include "Pixel.h"
 #include "Detection.h"
 
@@ -94,6 +103,232 @@ void testContainerPixels(int size) {
 }  // vector image est dépilé (supprimé du stack) => call vector destructor
    // deallocate all the memory in the heap for its elements
 
+template<class InputIterator>
+void displayIterable(InputIterator first, InputIterator last) {
+	for ( ; first != last; ++first) {
+		std::cout << *first << " ";
+	}
+	std::cout << std::endl;
+}
+
+bool compReverse(double d1, double d2) {
+	return d1 > d2;
+}
+
+bool lessThan32(double d) {
+	return d < 0.32;
+}
+
+void testContainersIterators() {
+	// vector: dynamic array, consecutive elements in memory
+	//	- random access en O(1)
+	// list: des chainons liés les uns aux autres
+	// list + vector :
+	//	- find in O(n)
+	// set: pas de doublons, rangés suivant un ordre (<)
+	//  - find in O(log(n))
+	std::vector<double> pressionVector = { 0.3, 0.35, 0.32 };
+	std::list<double> pressionList = { 0.4, 0.45, 0.42 };
+	std::set<double> pressionSet = { 0.5, 0.55, 0.52 };
+
+	// InputIterator = std::vector<double>::iterator
+	displayIterable(pressionVector.begin(), pressionVector.end());
+
+	// InputIterator = std::list<double>::iterator
+	displayIterable(pressionList.begin(), pressionList.end());
+
+	// InputIterator = std::set<double>::iterator
+	displayIterable(pressionSet.begin(), pressionSet.end());
+	// InputIterator = std::set<double>::reverse_iterator
+	displayIterable(pressionSet.rbegin(), pressionSet.rend());
+
+	// InputIterator = bool  => error compilation on *first
+	// displayIterable(false, true);
+
+	// parcours partiel
+	displayIterable(pressionVector.begin() + 1, pressionVector.end());
+	auto it = pressionList.begin();
+	//++(++it);
+	std::advance(it,2);
+	displayIterable(it, pressionList.end());
+	displayIterable(pressionVector.begin(), pressionVector.end()-1);
+	auto last = pressionSet.end();
+	std::advance(last,-2);
+	displayIterable(pressionSet.begin(), last);
+
+	// ajout aux extremités
+	pressionVector.push_back(0.315);
+	displayIterable(pressionVector.begin(), pressionVector.end());
+	pressionList.push_back(0.415);
+	pressionList.push_front(0.425);
+	displayIterable(pressionList.begin(), pressionList.end());
+
+	// insert 1 value
+	// set : coût O(log(n))
+	auto res1 = pressionSet.insert(0.525);
+	auto res2 = pressionSet.insert(0.525); // no doubles
+	displayIterable(pressionSet.begin(), pressionSet.end());
+	std::cout << "\t - insert 1: " << std::boolalpha << res1.second << " / " << *(res1.first) << std::endl;
+	std::cout << "\t - insert 2: " << std::boolalpha << res2.second << " / " << *(res2.first) << std::endl;
+	// vector: coût : recherche O(1) + WARNING: deplacement elements à droite
+	pressionVector.insert(pressionVector.begin()+2, 0.325);
+	displayIterable(pressionVector.begin(), pressionVector.end());
+	// list: coût : advance + insert chainon kdo
+	auto pos = pressionList.begin();
+	std::advance(pos, 2);
+	pressionList.insert(pos, 0.475);
+	displayIterable(pressionList.begin(), pressionList.end());
+
+	// insert par lot
+	pressionSet.insert(pressionVector.begin(), pressionVector.end());
+	displayIterable(pressionSet.begin(), pressionSet.end());
+	auto pos2 =  pressionList.begin();
+	std::advance(pos2, 3);
+	pressionList.insert(pos, pressionVector.begin(), pressionVector.end());
+	displayIterable(pressionList.begin(), pressionList.end());
+
+	// assign
+	pressionVector.assign(pressionList.begin(), pressionList.end());
+	displayIterable(pressionVector.begin(), pressionVector.end());
+
+	// algo
+	double pressionTotal = std::accumulate(pressionVector.begin(), pressionVector.end(), 0.0);
+	std::cout << "Total: " << pressionTotal << std::endl;
+	double pressionPartTotal = std::accumulate(pressionVector.begin()+2, pressionVector.end()-3, 0.0);
+	std::cout << "Total partiel: " << pressionPartTotal << std::endl;
+	// sort by default
+	std::sort(pressionVector.begin(), pressionVector.end()); // cout O(n*log(n))
+	displayIterable(pressionVector.begin(), pressionVector.end());
+	// sort custom
+	// std::sort(pressionVector.begin(), pressionVector.end(), compReverse);
+	// std::sort(pressionVector.begin(), pressionVector.end(), &compReverse);
+	std::sort(pressionVector.begin(), pressionVector.end(), std::greater<double>());
+	displayIterable(pressionVector.begin(), pressionVector.end());
+
+	// algo with predicate
+	auto nb = std::count_if(pressionVector.begin(), pressionVector.end(), lessThan32);
+	std::cout << "Nb elements < 0.32: " << nb << std::endl;
+	// same thing with anonymous function
+	auto nb2 = std::count_if(pressionVector.begin(), pressionVector.end(),
+			[](auto d){return d < 0.32;} );
+	std::cout << "Nb elements < 0.32: " << nb2 << std::endl;
+	double thresholdMax = 0.34;
+	auto nb3 = std::count_if(pressionVector.begin(), pressionVector.end(),
+				[thresholdMax](auto d){return d < thresholdMax;} ); // avec capture de thresholdMax
+	std::cout << "Nb elements < " << thresholdMax << ": " << nb3 << std::endl;
+
+	// vecteur result de la taille du vecteur source
+	std::vector<double> pressionResult(pressionVector.size());
+	// appliquer p -> 0.9*p + 0.001 à tous les éléments de pressionVector
+	// et ranger les résultats dans le vecteur pressionResult
+	std::transform(pressionVector.begin(), pressionVector.end(), pressionResult.begin(),
+			[](auto p){return 0.9*p + 0.001;});
+	displayIterable(pressionResult.begin(), pressionResult.end());
+
+//	for (const double &element: pressionSet) {
+//		std::cout << element << " ";
+//	}
+//	std::cout << std::endl;
+//	for (auto it = pressionSet.begin(); it != pressionSet.end(); ++it) {
+//		std::cout << *it << " ";
+//	}
+//	std::cout << std::endl;
+
+
+}
+
+void testContainersIteratorsPixels() {
+	// element du vector en mode direct (attention aux copies)
+	Pixel p1(128,0,0);
+	Pixel p2(128,0,1);
+//	std::vector<Pixel> image = { p1, p2 };
+//	std::vector<Pixel> image;
+//	image.push_back(p1);
+//	image.push_back(p2);
+////	displayIterable(image.begin(), image.end());
+//	std::vector<std::vector<Pixel>> imageCollection;
+
+	// element du vector en mode reference
+	// std::vector<Pixel&> image2;
+	// impossible car en interne le vecteur utilise des pointeurs sur les éléments
+	// Regle du C++: un pointeur sur une référence c'est impossible
+
+	// element du vector en mode pointeur
+	std::vector<Pixel*> image2 = { &p1, &p2};
+	std::cout << "Adresses of pixel: " << (void *) &p1 << ", " << (void *) &p2 << std::endl;
+	displayIterable(image2.begin(), image2.end());
+}
+
+std::vector<Pixel*>* createImage(size_t width, size_t height) {
+	//std::vector<Pixel*> res(width*height);
+	std::vector<Pixel*> *res = new std::vector<Pixel*>(width*height);
+	// fill vector with random data
+	std::default_random_engine generator;
+	std::normal_distribution<double> distribution(150.0,100.0);
+	for (size_t i=0; i < height; i++) {
+		for (size_t j=0; j < width; j++) {
+			Pixel *pixel_ptr = new Pixel((uint8_t) distribution(generator), i, j);
+			(*res)[i*width + j] = pixel_ptr;
+		}
+	}
+	return res;
+}
+
+void deleteImage(std::vector<Pixel*>* image_ptr) {
+	for (auto pixel_ptr: *image_ptr) {
+		delete pixel_ptr;
+	}
+	delete image_ptr;
+}
+
+void saveImageTxt(const std::vector<Pixel*>* image_ptr, const std::string &filename) {
+	std::ofstream out;
+	out.open(filename, std::ofstream::out);  // output stream en mode écrase
+	for (auto pixel_ptr : *image_ptr) {
+		out << pixel_ptr << std::endl;
+	}
+	out.close();
+}
+
+void saveImagePbm(const std::vector<Pixel*>* image_ptr, const std::string &filename) {
+	std::ofstream out;
+	out.open(filename, std::ofstream::out); // | std::ofstream::binary);  // output stream en mode écrase
+	out << "P1" << std::endl;
+	out << "800 800" << std::endl;
+	for (auto pixel_ptr : *image_ptr) {
+		out << pixel_ptr->getGreyScale() << std::endl;
+	}
+	out.close();
+}
+
+void trueLifeCycleContainer() {
+	// 1. create data
+	std::vector<Pixel*> *image_ptr = createImage(800, 800);
+	// 2. manipuler la data: smoothintg sur toute l'image
+	// displayIterable(image_ptr->begin(), image_ptr->end());
+	uint8_t threshold = 150;
+	auto nbUnderThreshold = std::count_if(image_ptr->begin(), image_ptr->end(),
+			[threshold](auto pixel_ptr){return  pixel_ptr->getGreyScale() <= threshold;});
+	std::cout << "Nb under threshold " << (uint16_t) threshold
+			<< ": " << nbUnderThreshold << std::endl;
+	for (auto pixel_ptr: *image_ptr) {
+		pixel_ptr-> smoothing(threshold);
+	}
+	nbUnderThreshold = std::count_if(image_ptr->begin(), image_ptr->end(),
+				[threshold](auto pixel_ptr){return  pixel_ptr->getGreyScale() <= threshold;});
+	std::cout << "Nb under threshold " << (uint16_t) threshold
+				<< ": " << nbUnderThreshold << std::endl;
+	auto nbEqualsThreshold = std::count_if(image_ptr->begin(), image_ptr->end(),
+			[threshold](auto pixel_ptr){return  pixel_ptr->getGreyScale() == threshold;});
+	std::cout << "Nb equals threshold " << (uint16_t) threshold
+					<< ": " << nbEqualsThreshold << std::endl;
+	// 3. sauvegarde
+	saveImageTxt(image_ptr, "image.txt");
+	saveImagePbm(image_ptr, "image.pbm");
+	// 4. supprimer la data
+	deleteImage(image_ptr);
+}
+
 void testDetection() {
 	Detection detect1;
 	Detection detect2(128, 3,4);
@@ -175,13 +410,17 @@ void testDetectionSubstitution() {
 }
 
 
+
 int main(){
 	// testPixel();
 	// testContainerPixels(10);
 	// testContainerPixels(300000000);
+	// testContainersIterators();
+	// testContainersIteratorsPixels();
+	trueLifeCycleContainer();
 	// testDetection();
-	testDetectionSubstitution();
-	//waitForUser();
+	// testDetectionSubstitution();
+	waitForUser();
 }
 
 

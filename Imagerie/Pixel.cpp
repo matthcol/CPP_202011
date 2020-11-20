@@ -24,7 +24,7 @@ Pixel::Pixel(uint8_t greyScale, uint16_t x, uint16_t y):
 }
 
 Pixel::~Pixel() {
-	std::clog << "Pixel destroyed: " << *this << std::endl;
+	// std::clog << "Pixel destroyed: " << *this << std::endl;
 }
 
 bool Pixel::operator==(const Pixel &other) {
@@ -83,4 +83,6 @@ std::ostream& operator<<(std::ostream &out, const Pixel &pixel) {
 	return out << pixel.toString();
 }
 
-
+std::ostream& operator <<(std::ostream &out, const Pixel *pixel_ptr) {
+	return out << pixel_ptr->toString();
+}

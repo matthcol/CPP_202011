@@ -40,5 +40,6 @@ public:
 };
 
 std::ostream& operator<<(std::ostream &out, const Pixel &pixel);
+std::ostream& operator<<(std::ostream &out, const Pixel *pixel_ptr);
 
 #endif /* PIXEL_H_ */
